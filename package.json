@@ -1,5 +1,5 @@
 {
-    "name": "next-js-jwt-authentication-example",
+    "name": "dyne-next",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -17,6 +17,7 @@
         "react-dom": "^17.0.2",
         "react-hook-form": "^7.12.1",
         "rxjs": "^7.3.0",
+        "serverless-mysql": "^1.5.4",
         "yup": "^0.32.9"
     }
 }

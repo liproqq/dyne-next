@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Link from 'next/link'
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -20,7 +21,7 @@ function Login() {
 
     // form validation rules 
     const validationSchema = Yup.object().shape({
-        username: Yup.string().required('Username is required'),
+        name: Yup.string().required('Name is required'),
         password: Yup.string().required('Password is required')
     });
     const formOptions = { resolver: yupResolver(validationSchema) };
@@ -29,9 +30,10 @@ function Login() {
     const { register, handleSubmit, setError, formState } = useForm(formOptions);
     const { errors } = formState;
 
-    function onSubmit({ username, password }) {
-        return userService.login(username, password)
-            .then(() => {
+    function onSubmit({ name, password }) {
+        return userService.login(name, password)
+            .then((user) => {
+                console.log("user" + user)
                 // get return url from query parameters or default to '/'
                 const returnUrl = router.query.returnUrl || '/';
                 router.push(returnUrl);
@@ -43,18 +45,14 @@ function Login() {
 
     return (
         <div className="col-md-6 offset-md-3 mt-5">
-            <div className="alert alert-info">
-                Username: test<br />
-                Password: test
-            </div>
             <div className="card">
                 <h4 className="card-header">Next.js JWT Login Example</h4>
                 <div className="card-body">
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="form-group">
-                            <label>Username</label>
-                            <input name="username" type="text" {...register('username')} className={`form-control ${errors.username ? 'is-invalid' : ''}`} />
-                            <div className="invalid-feedback">{errors.username?.message}</div>
+                            <label>Name</label>
+                            <input name="name" type="text" {...register('name')} className={`form-control ${errors.name ? 'is-invalid' : ''}`} />
+                            <div className="invalid-feedback">{errors.name?.message}</div>
                         </div>
                         <div className="form-group">
                             <label>Password</label>
@@ -69,6 +67,11 @@ function Login() {
                             <div className="alert alert-danger mt-3 mb-0">{errors.apiError?.message}</div>
                         }
                     </form>
+                    <Link href="/register">
+                        <a>
+                            Not registered yet?
+                        </a>
+                    </Link>
                 </div>
             </div>
         </div>
