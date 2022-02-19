@@ -62,16 +62,6 @@ function App({ Component, pageProps }) {
                     }
                 </div>
             </div>
-
-            {/* credits */}
-            <div className="text-center mt-4">
-                <p>
-                    <a href="https://jasonwatmore.com/post/2021/08/04/next-js-11-jwt-authentication-tutorial-with-example-app" target="_top">Next.js 11 - JWT Authentication Tutorial with Example App</a>
-                </p>
-                <p>
-                    <a href="https://jasonwatmore.com" target="_top">JasonWatmore.com</a>
-                </p>
-            </div>
         </>
     );
 }

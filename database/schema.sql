@@ -17,9 +17,9 @@ CREATE TABLE `gm` (
 );
 CREATE TABLE `gm2team` (
 	`gm2team_id` INT NOT NULL AUTO_INCREMENT,
-	`gm_id` INT NOT NULL AUTO_INCREMENT,
-	`team_id` INT NOT NULL AUTO_INCREMENT,
-	`season_id` INT NOT NULL AUTO_INCREMENT,
+	`gm_id` INT NOT NULL,
+	`team_id` INT NOT NULL,
+	`season` INT NOT NULL,
 	PRIMARY KEY (`gm2team_id`)
 );
 CREATE TABLE `season` (
@@ -40,6 +40,7 @@ CREATE TABLE `team` (
 	`font2` char(7) NOT NULL,
 	`old_id` smallint NOT NULL,
 	`start` smallint NOT NULL,
+	`end` smallint,
 	`logo` varchar(255) NOT NULL,
 	PRIMARY KEY (`team_id`)
 );
