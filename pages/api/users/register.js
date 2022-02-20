@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 import getConfig from 'next/config';
-import excuteQuery from 'lib/db';
+import executeQuery from 'lib/db';
 
 import { apiHandler } from 'helpers/api';
 
@@ -24,7 +24,7 @@ export default function random(req, res) {
 
     if (!name || !password || !steam) throw 'Missing required field';
 
-    const dbRes = await excuteQuery({ query: 'INSERT INTO gm(name, password, steam) VALUES (?,?,?)', values: [name, password, steam] })
+    const dbRes = await executeQuery({ query: 'INSERT INTO gm(name, password, steam) VALUES (?,?,?)', values: [name, password, steam] })
 
     console.log(dbRes)
     // create a jwt token that is valid for 7 days

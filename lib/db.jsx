@@ -8,7 +8,18 @@ const db = mysql({
     password: process.env.MYSQL_PASSWORD
   }
 });
-export default async function excuteQuery({ query, values }) {
+
+const sql2json = (sql) => {
+  try {
+    return JSON.parse(JSON.stringify(sql))
+  } catch (error) {
+    return error
+  }
+}
+
+export { sql2json };
+
+export default async function executeQuery({ query, values }) {
   try {
     const results = await db.query(query, values);
     await db.end();

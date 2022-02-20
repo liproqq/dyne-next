@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 import getConfig from 'next/config';
-import excuteQuery from 'lib/db';
+import executeQuery from 'lib/db';
 
 import { apiHandler } from 'helpers/api';
 
@@ -19,7 +19,7 @@ function handler(req, res) {
 
     async function authenticate() {
         const { name, password } = req.body;
-        const [gm] = await excuteQuery({
+        const [gm] = await executeQuery({
             query: "SELECT name FROM gm WHERE name=? AND password=? LIMIT 1",
             values: [name, password]
         })
