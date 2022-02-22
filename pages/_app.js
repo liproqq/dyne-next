@@ -11,7 +11,6 @@ export default App;
 function App({ Component, pageProps }) {
     const router = useRouter();
     const [authorized, setAuthorized] = useState(false);
-    const [userObject, setUserObject] = useState()
 
     useEffect(() => {
         // run auth check on initial load
@@ -23,8 +22,6 @@ function App({ Component, pageProps }) {
 
         // run auth check on route change
         router.events.on('routeChangeComplete', authCheck)
-
-        setUserObject(userService.userValue.name)
 
         // unsubscribe from events in useEffect return function
         return () => {
@@ -51,7 +48,7 @@ function App({ Component, pageProps }) {
     return (
         <>
             <Head>
-                <title>Next.js 11 - JWT Authentication Example</title>
+                <title>Dyne App</title>
 
                 {/* bootstrap css */}
                 <link href="//netdna.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
