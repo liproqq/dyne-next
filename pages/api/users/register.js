@@ -6,10 +6,6 @@ import { apiHandler } from 'helpers/api';
 
 const { serverRuntimeConfig } = getConfig();
 
-// users in JSON file for simplicity, store in a db for production applications
-const users = require('data/users.json');
-
-// export default apiHandler(handler);
 
 export default function random(req, res) {
   switch (req.method) {
