@@ -40,7 +40,7 @@ function handler(req, res) {
   }
 }
 
-const createNewGameId = async (home, away) => {
+export const createNewGameId = async (home, away) => {
   const _ = await executeQuery({
     query:
       `INSERT INTO game(season, home, away, date) 
@@ -53,7 +53,7 @@ const createNewGameId = async (home, away) => {
   return gameId.game_id
 }
 
-const getCurrentTeamIdByGmName = async (gmName) => {
+export const getCurrentTeamIdByGmName = async (gmName) => {
   let [ownTeamId] = await executeQuery({
     query: `SELECT team_id from gm2team
                 JOIN gm ON gm2team.gm_id=gm.gm_id AND
@@ -65,7 +65,7 @@ const getCurrentTeamIdByGmName = async (gmName) => {
 
 }
 
-const getGameIdByTeamIds = async (first, second) => {
+export const getGameIdByTeamIds = async (first, second) => {
   const gameId = await executeQuery({
     query:
       `
@@ -79,7 +79,7 @@ const getGameIdByTeamIds = async (first, second) => {
   return gameId
 }
 
-const getCurrentRosterByTeamId = async (teamId) => {
+export const getCurrentRosterByTeamId = async (teamId) => {
   const roster = await executeQuery({
     query:
       `
@@ -94,7 +94,7 @@ const getCurrentRosterByTeamId = async (teamId) => {
   return roster
 }
 
-const getGameStatsByPlayerAndGameId = async (playerId, gameId) => {
+export const getGameStatsByPlayerAndGameId = async (playerId, gameId) => {
   const [stats] = await executeQuery({
     query:
       `
@@ -107,7 +107,7 @@ const getGameStatsByPlayerAndGameId = async (playerId, gameId) => {
   return stats
 }
 
-const getTeamGameStatsByTeamAndGameId = async (teamId, gameId) => {
+export const getTeamGameStatsByTeamAndGameId = async (teamId, gameId) => {
   const [stats] = await executeQuery({
     query:
       `

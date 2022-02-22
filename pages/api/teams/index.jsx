@@ -17,7 +17,9 @@ function handler(req, res) {
       query:
         `SELECT team_id, name, short, code FROM team
         WHERE start<(SELECT season FROM season WHERE current=1) AND
-              end>(SELECT season FROM season WHERE current=1);`,
+              end>(SELECT season FROM season WHERE current=1) AND
+              code NOT IN ("N/A","FA")
+        ORDER BY short;`,
       values: []
     })
 

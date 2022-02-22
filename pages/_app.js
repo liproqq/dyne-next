@@ -11,6 +11,7 @@ export default App;
 function App({ Component, pageProps }) {
     const router = useRouter();
     const [authorized, setAuthorized] = useState(false);
+    const [userObject, setUserObject] = useState()
 
     useEffect(() => {
         // run auth check on initial load
@@ -22,6 +23,8 @@ function App({ Component, pageProps }) {
 
         // run auth check on route change
         router.events.on('routeChangeComplete', authCheck)
+
+        setUserObject(userService.userValue.name)
 
         // unsubscribe from events in useEffect return function
         return () => {

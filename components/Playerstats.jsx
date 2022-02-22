@@ -6,25 +6,37 @@ export default ({ players, stat }) => {
 
   return (
     <>
-      {
-        players.map((player, index) => {
-          return (
-            <div className="form-group" style={{ display: "flex" }}>
-              <label >{player.name} </label>
-              {playerstats.map(stat =>
-                <input
-                  placeholder={stat}
-                  type="number"
-                  style={{ width: "50px" }}
-                  {...register(`players.${index}.${stat}`)}
-                  value={players[index][stat]}
-                />
-              )}
-            </div>
-          )
+      <div style={{ display: "flex" }}>
+        <label style={{ flex: "1" }} >Name </label>
+        {playerstats.map(stat =>
+          <div
+            style={{ width: "50px" }}
+          >
+            {stat}
+          </div>
+        )}
+      </div>
+      <div>
+        {
+          players.map((player, index) => {
+            return (
+              <div className="form-group" style={{ display: "flex" }}>
+                <label style={{ flex: "1" }} >{player.name} </label>
+                {playerstats.map(stat =>
+                  <input
+                    placeholder={stat}
+                    type={["starter", "pog"].includes(stat) ? "checkbox" : "number"}
+                    style={{ width: "50px" }}
+                    {...register(`players.${index}.${stat}`)}
+                    value={players[index][stat]}
+                  />
+                )}
+              </div>
+            )
 
-        })
-      }
+          })
+        }
+      </div>
     </>
   )
 }

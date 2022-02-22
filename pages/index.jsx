@@ -8,9 +8,6 @@ function Home() {
     useEffect(() => {
 
     }, []);
-
-    console.log(userService.name)
-
     return (
         <div className="card mt-4">
             <h4 className="card-header">Hi, {userService.userValue.name}</h4>
