@@ -1,5 +1,5 @@
 import { apiHandler } from 'helpers/api';
-import { getCurrentTeamIdByGmName } from 'pages/api/stats/game.jsx'
+import { getCurrentTeamIdByGmName } from 'lib/queries'
 
 export default apiHandler(handler);
 

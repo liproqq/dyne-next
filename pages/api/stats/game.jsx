@@ -1,6 +1,15 @@
-import executeQuery, { sql2json } from 'lib/db';
+import { sql2json } from 'lib/db';
 
 import { apiHandler } from 'helpers/api';
+import {
+  getCurrentTeamIdByGmName,
+  getGameIdByTeamIds,
+  createNewGameId,
+  getCurrentRosterByTeamId,
+  getGameStatsByPlayerAndGameId,
+  getTeamGameStatsByTeamAndGameId
+} from 'lib/queries';
+import executeQuery from 'lib/db';
 
 export default apiHandler(handler);
 
@@ -8,6 +17,8 @@ function handler(req, res) {
   switch (req.method) {
     case 'GET':
       return getGameStats();
+    case 'POST':
+      return postGameStats();
     default:
       return res.status(200).end(`Internal Error in api/stats/game`)
   }
@@ -38,84 +49,36 @@ function handler(req, res) {
 
     return res.status(200).json({ gameId, ownRosterStats, ownTeamStats })
   }
+
+  async function postGameStats() {
+    const { ownTeamId, opponent, players, team } = req.body
+    let [gameId] = await getGameIdByTeamIds(ownTeamId, opponent)
+    if (!gameId) {
+      gameId = await createNewGameId(ownTeamId, opponent)
+    } else {
+      gameId = gameId.game_id
+    }
+
+    const teamRes = await executeQuery({
+      query: "INSERT INTO game_stats_team(team_id, game_id, pip, lead, poss, tf, `2nd`, bench, fbp, pipm, pipa) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+      values: [ownTeamId, gameId, team.pip, team.lead, team.poss, team.tf, team["2nd"], team.bench, team.fbp, team.pipm, team.pipa]
+    })
+
+    const playerRes = await Promise.all(players.map(async (player) => {
+      try {
+        if (player.min) {
+          return await executeQuery({
+            query: "INSERT INTO game_stats(player_id, game_id, min, pkt, reb, ast, stl, blk, `to`, fgm, fga, `3ptm`, `3pta`, ftm, fta, oreb, pf, pls_mns, starter, pog) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            values: [player.id, gameId, player.min, player.pkt, player.reb, player.ast, player.stl, player.blk, player.to, player.fgm, player.fga, player["3ptm"], player["3pta"], player.ftm, player.fta, player.oreb, player.pf, player.pls_mns, +player.starter, +player.pog]
+          })
+        }
+      } catch (error) {
+        return
+      }
+    }))
+    return res.status(200).json({ teamRes, playerRes })
+
+  }
 }
 
-export const createNewGameId = async (home, away) => {
-  const _ = await executeQuery({
-    query:
-      `INSERT INTO game(season, home, away, date) 
-      VALUES ((SELECT season FROM season WHERE current=1), ?, ?, NOW());`,
-    values: [home, away]
-  })
-  const gameId = await executeQuery({
-    query: "SELECT LAST_INSERTED_ID()"
-  })
-  return gameId.game_id
-}
 
-export const getCurrentTeamIdByGmName = async (gmName) => {
-  let [ownTeamId] = await executeQuery({
-    query: `SELECT team_id from gm2team
-                JOIN gm ON gm2team.gm_id=gm.gm_id AND
-                    season=(SELECT season FROM season WHERE current=1)
-                WHERE gm.name=?`,
-    values: [gmName]
-  })
-  return ownTeamId.team_id
-
-}
-
-export const getGameIdByTeamIds = async (first, second) => {
-  const gameId = await executeQuery({
-    query:
-      `
-            SELECT game_id FROM game 
-                WHERE (home=? or away=?) AND 
-                  (home=? or away=?) AND
-                  season=(SELECT season FROM season WHERE current=1);
-          `,
-    values: [first, first, second, second]
-  })
-  return gameId
-}
-
-export const getCurrentRosterByTeamId = async (teamId) => {
-  const roster = await executeQuery({
-    query:
-      `
-            SELECT player.player_id, CONCAT(player.first," ",player.last) AS name FROM roster
-            JOIN player ON roster.player_id=player.player_id
-                WHERE roster.team_id=? AND
-                  roster.season=(SELECT season FROM season WHERE current=1)
-              ORDER BY roster.ovr DESC;
-          `,
-    values: [teamId]
-  })
-  return roster
-}
-
-export const getGameStatsByPlayerAndGameId = async (playerId, gameId) => {
-  const [stats] = await executeQuery({
-    query:
-      `
-            SELECT * FROM game_stats
-            WHERE player_id=? AND
-                  game_id=?;
-          `,
-    values: [playerId, gameId]
-  })
-  return stats
-}
-
-export const getTeamGameStatsByTeamAndGameId = async (teamId, gameId) => {
-  const [stats] = await executeQuery({
-    query:
-      `
-            SELECT * FROM game_stats_team
-            WHERE team_id=? AND
-                  game_id=?;
-          `,
-    values: [teamId, gameId]
-  })
-  return stats
-}

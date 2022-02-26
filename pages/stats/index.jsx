@@ -15,6 +15,8 @@ const playerstats = ["pkt", "reb"]
 
 const index = () => {
   const [ownRoster, setOwnRoster] = useState([])
+  const [ownTeamId, setOwnTeamId] = useState()
+  const [saved, setSaved] = useState(false)
   const [teams, setTeams] = useState([])
 
   useEffect(() => {
@@ -22,6 +24,7 @@ const index = () => {
     const init = async () => {
       const teamsBaseUrl = `${publicRuntimeConfig.apiUrl}/teams`
       const { teamId: ownTeamId } = await fetchWrapper.get(`${teamsBaseUrl}/gm/${gmName}`)
+      setOwnTeamId(ownTeamId)
       const { roster: ownRoster } = await fetchWrapper.get(`${teamsBaseUrl}/roster/${ownTeamId}`)
       setOwnRoster(ownRoster)
       console.log(ownRoster)
@@ -44,26 +47,26 @@ const index = () => {
   const methods = useForm();
   const { errors } = methods.formState;
 
-  function onSubmit(formState) {
+  async function onSubmit(formState) {
     console.log(formState)
+    const saved = await fetchWrapper.post(`${publicRuntimeConfig.apiUrl}/stats/game`, formState)
+    setSaved(saved)
   }
   return (
     <FormProvider {...methods}>
-
+      {methods.setValue("ownTeamId", parseInt(ownTeamId))}
       <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <div className="form-group">
-          <select name="opponent" {...methods.register('opponent')}>
+        <div className="form-group" style={{ display: "flex" }}>
+          <select style={{ flex: "1" }} name="opponent" {...methods.register('opponent', { valueAsNumber: true, onChange: () => { console.log("change") } })}>
             <option value="" default>Opponent</option>
             {teams && teams.map(team =>
               (<option key={team.team_id} value={team.team_id}>{team.name}</option>)
             )}
           </select>
           <div className="invalid-feedback">{errors.opponent?.message}</div>
-        </div>
-        <div className="form-group">
           {teamstats.map(stat =>
           (<>
-            <input style={{ width: "60px" }} type="number" key={stat} name={stat} placeholder={stat} {...methods.register(stat)}></input>
+            <input style={{ width: "60px" }} type="number" key={stat} name={stat} placeholder={stat} {...methods.register(`team.${stat}`, { valueAsNumber: true })}></input>
           </>
           )
           )}
@@ -71,7 +74,8 @@ const index = () => {
 
         <Playerstats players={ownRoster} />
 
-        <button type="submit" className="btn btn-primary">Save</button>
+        <button type="submit" className="btn btn-primary" disabled={saved}>Save</button>
+        {saved && <div>Saved!</div>}
       </form>
 
     </FormProvider>

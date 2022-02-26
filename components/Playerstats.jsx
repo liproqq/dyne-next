@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 
-export default ({ players, stat }) => {
-  const { register } = useFormContext(); // retrieve all hook methods
+const Playerstats = ({ players, stat }) => {
+  const { register, setValue } = useFormContext(); // retrieve all hook methods
   const playerstats = [`min`, `pkt`, `reb`, `ast`, `stl`, `blk`, `to`, `fgm`, `fga`, `3ptm`, `3pta`, `ftm`, `fta`, `oreb`, `pf`, `pls_mns`, `starter`, `pog`]
 
   return (
@@ -20,17 +20,20 @@ export default ({ players, stat }) => {
         {
           players.map((player, index) => {
             return (
-              <div className="form-group" style={{ display: "flex" }}>
+              <div className="form-group" key={player.player_id} style={{ display: "flex" }}>
                 <label style={{ flex: "1" }} >{player.name} </label>
                 {playerstats.map(stat =>
                   <input
+                    key={player.player_id + stat}
                     placeholder={stat}
                     type={["starter", "pog"].includes(stat) ? "checkbox" : "number"}
                     style={{ width: "50px" }}
-                    {...register(`players.${index}.${stat}`)}
+                    {...register(`players.${index}.${stat}`, { valueAsNumber: !["starter", "pog"].includes(stat) })}
                     value={players[index][stat]}
                   />
                 )}
+                {setValue(`players.${index}.id`, player.player_id)}
+                {setValue(`players.${index}.name`, player.name)}
               </div>
             )
 
@@ -40,3 +43,4 @@ export default ({ players, stat }) => {
     </>
   )
 }
+export default Playerstats
