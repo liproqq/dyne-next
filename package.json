@@ -8,16 +8,19 @@
         "start": "next start"
     },
     "dependencies": {
+        "@hookform/error-message": "^2.0.0",
         "@hookform/resolvers": "^2.6.1",
         "express-jwt": "^6.0.0",
         "jsonwebtoken": "^8.5.1",
         "next": "^11.0.1",
         "prop-types": "^15.7.2",
         "react": "^17.0.2",
+        "react-data-table-component": "^7.4.7",
         "react-dom": "^17.0.2",
         "react-hook-form": "^7.12.1",
         "rxjs": "^7.3.0",
         "serverless-mysql": "^1.5.4",
+        "styled-components": "^5.3.5",
         "yup": "^0.32.9"
     }
 }

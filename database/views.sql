@@ -45,3 +45,110 @@ FROM (
   )
 ORDER BY `p`.`player_id`,
   `s`.`season`;
+CREATE VIEW `v_game_outcome` AS
+SELECT `g`.`game_id` AS `game_id`,
+  `g`.`season` AS `season`,
+  `g`.`home` AS `home`,
+  `g`.`away` AS `away`,
+  `g`.`date` AS `date`,
+  `g`.`type` AS `type`,
+  IF(
+    SUM(
+      IF(
+        `r`.`team_id` = `g`.`home`,
+        `gs`.`pkt`,
+        0
+      )
+    ) > SUM(
+      IF(
+        `r`.`team_id` = `g`.`away`,
+        `gs`.`pkt`,
+        0
+      )
+    ),
+    `g`.`home`,
+    `g`.`away`
+  ) AS `winner`,
+  IF(
+    SUM(
+      IF(
+        `r`.`team_id` = `g`.`home`,
+        `gs`.`pkt`,
+        0
+      )
+    ) < SUM(
+      IF(
+        `r`.`team_id` = `g`.`away`,
+        `gs`.`pkt`,
+        0
+      )
+    ),
+    `g`.`home`,
+    `g`.`away`
+  ) AS `loser`
+FROM (
+    (
+      `game` `g`
+      JOIN `game_stats` `gs` ON (`g`.`game_id` = `gs`.`game_id`)
+    )
+    JOIN `roster` `r` ON (
+      `g`.`season` = `r`.`season`
+      AND `gs`.`player_id` = `r`.`player_id`
+    )
+  )
+GROUP BY `g`.`game_id`
+CREATE OR REPLACE VIEW `v_standings` AS
+SELECT IF(
+    w.team IS NOT NULL,
+    w.season,
+    l.season
+  ) AS sseason,
+  IF(w.team IS NOT NULL, w.team, l.team) AS team,
+  IF(ISNULL(wins), 0, wins) AS wins,
+  losses
+FROM (
+    SELECT season,
+      loser AS team,
+      COUNT(1) AS losses
+    FROM dynedb.v_game_outcome
+    go
+    GROUP BY loser,
+      season
+  ) l
+  LEFT JOIN (
+    SELECT season,
+      winner AS team,
+      COUNT(winner) AS wins
+    FROM dynedb.v_game_outcome
+    go
+    GROUP BY winner,
+      season
+  ) w ON l.team = w.team
+UNION
+SELECT IF(
+    w.team IS NOT NULL,
+    w.season,
+    l.season
+  ) AS season,
+  IF(w.team IS NOT NULL, w.team, l.team) AS team,
+  wins,
+  IF(ISNULL(losses), 0, losses) AS losses
+FROM (
+    SELECT season,
+      loser AS team,
+      COUNT(1) AS losses
+    FROM dynedb.v_game_outcome
+    go
+    GROUP BY loser,
+      season
+  ) l
+  RIGHT JOIN (
+    SELECT season,
+      winner AS team,
+      COUNT(winner) AS wins
+    FROM dynedb.v_game_outcome
+    go
+    GROUP BY winner,
+      season
+  ) w ON l.team = w.team;
+;

@@ -10,7 +10,7 @@ const Playerstats = ({ players, stat }) => {
         <label style={{ flex: "1" }} >Name </label>
         {playerstats.map(stat =>
           <div
-            style={{ width: "50px" }}
+            style={{ width: "50px" }} key={stat}
           >
             {stat}
           </div>

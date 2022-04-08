@@ -73,3 +73,15 @@ export const getTeamGameStatsByTeamAndGameId = async (teamId, gameId) => {
   });
   return stats;
 };
+
+export const getCurrentStandings = async () => {
+  const standings = await executeQuery({
+    query: `
+            SELECT name, short, code, wins, losses FROM v_standings s
+            JOIN team t on t.team_id=s.team
+            WHERE (SELECT season FROM season WHERE current=1);
+          `,
+    values: []
+  });
+  return standings;
+};

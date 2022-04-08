@@ -25,6 +25,7 @@ function Nav() {
             <div className="navbar-nav">
                 <NavLink href="/" exact className="nav-item nav-link">Home</NavLink>
                 <NavLink href="/stats" exact className="nav-item nav-link">Stats</NavLink>
+                <NavLink href="/standings" exact className="nav-item nav-link">Standings</NavLink>
                 <a onClick={logout} className="nav-item nav-link">Logout</a>
             </div>
         </nav>

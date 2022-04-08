@@ -3,7 +3,7 @@ import { errorHandler, jwtMiddleware } from 'helpers/api';
 export { apiHandler };
 
 function apiHandler(handler) {
-    return async (req, res) => {
+    return async(req, res) => {
         try {
             // global middleware
             await jwtMiddleware(req, res);
