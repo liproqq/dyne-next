@@ -77,10 +77,10 @@ export const getTeamGameStatsByTeamAndGameId = async (teamId, gameId) => {
 export const getCurrentStandings = async () => {
   const standings = await executeQuery({
     query: `
-            SELECT name, short, code, wins, losses FROM v_standings s
-            JOIN team t on t.team_id=s.team
-            WHERE (SELECT season FROM season WHERE current=1);
-          `,
+SELECT name, short, code, wins, losses FROM v_standings s
+JOIN team t on t.team_id=s.team
+WHERE (SELECT season FROM season WHERE current=1)
+ORDER BY wins DESC, losses DESC;          `,
     values: []
   });
   return standings;

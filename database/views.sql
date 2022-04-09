@@ -45,64 +45,46 @@ FROM (
   )
 ORDER BY `p`.`player_id`,
   `s`.`season`;
-CREATE VIEW `v_game_outcome` AS
-SELECT `g`.`game_id` AS `game_id`,
-  `g`.`season` AS `season`,
-  `g`.`home` AS `home`,
-  `g`.`away` AS `away`,
-  `g`.`date` AS `date`,
-  `g`.`type` AS `type`,
-  IF(
-    SUM(
-      IF(
-        `r`.`team_id` = `g`.`home`,
-        `gs`.`pkt`,
-        0
-      )
-    ) > SUM(
-      IF(
-        `r`.`team_id` = `g`.`away`,
-        `gs`.`pkt`,
-        0
-      )
+CREATE OR REPLACE VIEW `v_game_outcome` AS
+select `g`.`game_id` AS `game_id`,
+  max(`g`.`season`) AS `season`,
+  max(`g`.`home`) AS `home`,
+  max(`g`.`away`) AS `away`,
+  max(`g`.`date`) AS `date`,
+  max(`g`.`type`) AS `type`,
+  if(
+    (
+      sum(if((`r`.`team_id` = `g`.`home`), `gs`.`pkt`, 0)) > sum(if((`r`.`team_id` = `g`.`away`), `gs`.`pkt`, 0))
     ),
-    `g`.`home`,
-    `g`.`away`
+    max(`g`.`home`),
+    max(`g`.`away`)
   ) AS `winner`,
-  IF(
-    SUM(
-      IF(
-        `r`.`team_id` = `g`.`home`,
-        `gs`.`pkt`,
-        0
-      )
-    ) < SUM(
-      IF(
-        `r`.`team_id` = `g`.`away`,
-        `gs`.`pkt`,
-        0
-      )
+  if(
+    (
+      sum(if((`r`.`team_id` = `g`.`home`), `gs`.`pkt`, 0)) < sum(if((`r`.`team_id` = `g`.`away`), `gs`.`pkt`, 0))
     ),
-    `g`.`home`,
-    `g`.`away`
+    max(`g`.`home`),
+    max(`g`.`away`)
   ) AS `loser`
-FROM (
+from (
     (
       `game` `g`
-      JOIN `game_stats` `gs` ON (`g`.`game_id` = `gs`.`game_id`)
+      join `game_stats` `gs` on((`g`.`game_id` = `gs`.`game_id`))
     )
-    JOIN `roster` `r` ON (
-      `g`.`season` = `r`.`season`
-      AND `gs`.`player_id` = `r`.`player_id`
+    join `roster` `r` on(
+      (
+        (`g`.`season` = `r`.`season`)
+        and (`gs`.`player_id` = `r`.`player_id`)
+      )
     )
   )
-GROUP BY `g`.`game_id`
+group by `g`.`game_id`;
 CREATE OR REPLACE VIEW `v_standings` AS
 SELECT IF(
     w.team IS NOT NULL,
     w.season,
     l.season
-  ) AS sseason,
+  ) AS season,
   IF(w.team IS NOT NULL, w.team, l.team) AS team,
   IF(ISNULL(wins), 0, wins) AS wins,
   losses
