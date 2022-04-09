@@ -6,12 +6,14 @@ const { serverRuntimeConfig } = getConfig();
 
 export { jwtMiddleware };
 
+const serverSidePropsEndpoints = ['/api/stats/standings', /^\/api\/roster\/.*/]
+
 function jwtMiddleware(req, res) {
     const middleware = expressJwt({ secret: serverRuntimeConfig.secret, algorithms: ['HS256'] }).unless({
         path: [
             // public routes that don't require authentication
             '/api/users/authenticate',
-            '/api/stats/standings',
+            ...serverSidePropsEndpoints
         ],
     });
 

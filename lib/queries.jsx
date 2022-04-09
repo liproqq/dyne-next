@@ -85,3 +85,10 @@ ORDER BY wins DESC, losses DESC;          `,
   });
   return standings;
 };
+export const getRosterByTeamAndSeason = async (team, season) => {
+  const roster = await executeQuery({
+    query: `SELECT * FROM v_full_roster WHERE code=? AND season=?`,
+    values: [team, season]
+  });
+  return roster;
+};
