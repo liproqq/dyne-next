@@ -72,5 +72,6 @@ function Roster({ roster, season, team }) {
 export async function getServerSideProps(context) {
   const [team, season] = context.query.params
   let roster = await fetchWrapper.get(`${publicRuntimeConfig.apiUrl}/roster/${team}/${season}`)
+  roster= roster.sort((a,b) => (b.ovr - a.ovr))
   return { props: { roster, season, team } }
 }
